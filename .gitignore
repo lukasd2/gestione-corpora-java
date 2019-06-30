@@ -1,0 +1,14 @@
+
+\.classpath
+
+\.project
+
+\.settings/org\.eclipse\.jdt\.core\.prefs
+
+bin/it/unipi/gestione/corpora/controller/GestioneCorpora\.class
+
+bin/it/unipi/gestione/corpora/utils/readFile\.class
+
+bin/it/unipi/gestione/corpora/utils/readFromFile\.class
+
+bin/it/unipi/gestione/corpora/utils/unzipFiles\.class
