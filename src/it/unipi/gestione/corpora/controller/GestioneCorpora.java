@@ -9,14 +9,17 @@ import it.unipi.gestione.corpora.utils.UnzipFiles;
 
 public class GestioneCorpora {
 	public static void main(String args[]) throws IOException {
+		final String UNIX = "/home/lukasz/gestione-corpora-java/0";
+		final String WS = "F:\\Java Thingies\\0\\";
+		
 		// get path with independent OS format
-		String sourcePath = Paths.get("F:\\Java Thingies\\0\\").toString();
-		String destPath = Paths.get("F:\\Java Thingies\\tokenizeResult\\").toString();
+		String sourcePath = Paths.get(UNIX).toString();
+		String destPath = Paths.get("/home/lukasz/gestione-corpora-java/output/").toString();
 		
 		UnzipFiles uf = new UnzipFiles();
 		long startTime = System.nanoTime();
 		
-		uf.unzipToDirectory(sourcePath, destPath);
+		//uf.unzipToDirectory(sourcePath, destPath);
 		
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);

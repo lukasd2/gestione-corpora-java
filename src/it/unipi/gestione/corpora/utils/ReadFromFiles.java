@@ -80,7 +80,23 @@ public class ReadFromFiles {
 			if(currentLine.contains(bookStart)) bookContent = true;
 			rowIndex++;
 		}
-		
+		int countWord = 0;
+		while((currentLine = reader.readLine()) != null) {
+			if(currentLine.contains(bookEnd)) break;
+			if(currentLine.equals("")) continue;
+			
+			String[] wordList = st.split(currentLine.toLowerCase());
+			//String delims = "[ .,?!]+";
+			//String[] wordList = currentLine.split(delims);
+			//countWord += wordList.length; 
+			for(String s : wordList) {
+				map.compute(s, (k, v) -> v == null
+						? new MutableInteger(0) : v).increment();
+				countWord += 1;
+			}
+
+		}
+		/*
 		if(bookContent) {
 			for(int i = 0; i < rowIndex; i ++) {
 				reader.readLine();
@@ -99,23 +115,24 @@ public class ReadFromFiles {
 					map.compute(s, (k, v) -> v == null
 							? new MutableInteger(0) : v).increment();
 					countWord += 1;
-					/*if (map.containsKey(s)) {
-			            // increment occurrence
-			            int occurrence = map.get(s);
-			            occurrence++;
-			            map.put(s, occurrence);
-			        } else {
-			            // add word and set occurrence to 1
-			            map.put(s, 1);
-			        }*/
 				}
 				//System.out.println(currentLine);
 				if(countWord >= threshold) threshold = heapsLaw(threshold);
 			}
 			//System.out.println(countWord);
-
-		}
+		*/
+		/*if (map.containsKey(s)) {
+        // increment occurrence
+        int occurrence = map.get(s);
+        occurrence++;
+        map.put(s, occurrence);
+    } else {
+        // add word and set occurrence to 1
+        map.put(s, 1);
+    }*/
+		//}
 		reader.close();
+		System.out.println(countWord);
 		printResults();
 	}
 	
