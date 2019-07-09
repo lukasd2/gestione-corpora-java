@@ -4,20 +4,6 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 public class SimpleTokenizer implements Tokenizer {
-	private static final Pattern[] NOT_CONTRACTIONS = { 
-			Pattern.compile("(?i)\\b(can)('t|not)\\b"),
-			Pattern.compile("(?i)(.)(n't)\\b") };
-
-	/**
-	 * List of contractions adapted from Robert MacIntyre's tokenizer.
-	 */
-	private static final Pattern[] CONTRACTIONS2 = {
-			Pattern.compile("(?i)(.)('ll|'re|'ve|'s|'m|'d)\\b"),
-			Pattern.compile("(?i)\\b(D)('ye)\\b"), Pattern.compile("(?i)\\b(Gim)(me)\\b"),
-			Pattern.compile("(?i)\\b(Gon)(na)\\b"), Pattern.compile("(?i)\\b(Got)(ta)\\b"),
-			Pattern.compile("(?i)\\b(Lem)(me)\\b"), Pattern.compile("(?i)\\b(Mor)('n)\\b"),
-			Pattern.compile("(?i)\\b(T)(is)\\b"), Pattern.compile("(?i)\\b(T)(was)\\b"),
-			Pattern.compile("(?i)\\b(Wan)(na)\\b") };
 
 	private static final Pattern[] DELIMITERS = {
 			// Separate most punctuation
@@ -49,7 +35,6 @@ public class SimpleTokenizer implements Tokenizer {
         for (String token : words) {
                 result.add(token);
         }
-        
         return result.toArray(new String[result.size()]);
 	}
 

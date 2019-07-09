@@ -1,22 +1,18 @@
 package it.unipi.gestione.corpora.utils;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class UnzipFiles {
 	
@@ -83,8 +79,7 @@ public class UnzipFiles {
 	}
 
 	public List<String> listAllfiles(File directory, List<String> pathList) throws IOException {
-		// TODO eliminare i zip doppi con encoding differente, scelgliere uno tra ASCII e ISO latin 1
-		Pattern pattern = Pattern.compile(UNWANTED_FILE_EXTENSIONS);
+		Pattern pattern = Pattern.compile(UNWANTED_FILE_EXTENSIONS); // TODO probably we want to select only numerical fileNames.
 		for (final File f : directory.listFiles()) {
 			Matcher matcher = pattern.matcher(f.getName());
 			if (matcher.find()) continue;
