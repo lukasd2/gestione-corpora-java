@@ -8,43 +8,43 @@ import it.unipi.gestione.corpora.manager.TextAnalysisFromFiles;
 import it.unipi.gestione.corpora.utils.UnzipFiles;
 
 public class GestioneCorpora {
-	public static void main(String args[]) throws IOException {
-		final String UNIX = "/home/lukasz/gestione-corpora-java/0";
-		final String WS = "F:\\Java Thingies\\tokenizeTest\\";
 
-		final String WSdestPath = "F:\\Java Thingies\\parsing3\\";
+	private final static boolean detailedStatistics = true;
+	
+	public static void main(String args[]) throws IOException {
+		// Unix and Windows paths examples
+		final String UNIXinput = "/home/lukasz/gestione-corpora-java/";
+		final String WSinput = "F:\\Java Thingies\\input\\";
+
+		final String WSdestPath = "F:\\Java Thingies\\output\\";
 		final String UnixdestPath = "/home/lukasz/gestione-corpora-java/output/";
 
 		// get path with independent OS format
-		String sourcePath = Paths.get(WS).toString();
+		String sourcePath = Paths.get(WSinput).toString();
 		String destPath = Paths.get(WSdestPath).toString();
 
 		UnzipFiles uf = new UnzipFiles();
-		System.out.println("*** START UNZIPPING FILES ***");
-		long startTime = System.nanoTime();
-
+		long measureUnzip = startTimeMeasure("*** START UNZIPPING FILES ***");
 		uf.unzipToDirectory(sourcePath, destPath);
+		stopTimeMeasure(measureUnzip, "*** STOP UNZIPPING FILES ***");
 		
-		System.out.println("*** STOP UNZIPPING FILES ***");
+		long measureText = startTimeMeasure("*** START ANALYZING FILES ***");
+		TextAnalysisFromFiles rff = new TextAnalysisFromFiles(destPath, detailedStatistics);
+		stopTimeMeasure(measureText, "*** STOP ANALYZING FILES ***");
+	}
+	// metodi di utilita per il calcolo dei tempi di esecuzione
+	private static long startTimeMeasure(String msg) {
+		System.out.println(msg);
+		return System.nanoTime();
+	}
 
+	private static void stopTimeMeasure(long startTime, String msg) {
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);
-		System.out.println("ms " + duration / 1000000);
+
+		System.out.println(msg);
+		System.out.println("Eseguito in " + duration / 1000000 + " milliseconds");
 		long seconds = TimeUnit.MILLISECONDS.toSeconds(duration / 1000000);
-		System.out.println("UNZIP seconds " + seconds);
-
-		long startTime2 = System.nanoTime();
-		System.out.println("*** START ANALYZING FILES ***");
-		
-		TextAnalysisFromFiles rff = new TextAnalysisFromFiles(destPath);
-
-		System.out.println("*** STOP ANALYZING FILES ***");
-		
-		long endTime2 = System.nanoTime();
-		long duration2 = (endTime2 - startTime2);
-		System.out.println("ms " + duration2 / 1000000);
-		long seconds2 = TimeUnit.MILLISECONDS.toSeconds(duration2 / 1000000);
-		System.out.println("Frequency seconds " + seconds2);
-
+		System.out.println("Eseguito in " + seconds + " seconds");
 	}
 }
