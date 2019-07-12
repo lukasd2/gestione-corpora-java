@@ -28,9 +28,9 @@ public class TextAnalysisFromFiles {
 	private final String bookEnd = "*** END OF THIS PROJECT GUTENBERG";
 
 	private int tokenCount;
-	private int documentCount;
+	private int documentCount; // conto i documenti che soddisfano i requisti quindi effettivamente analizzati
 
-	private int threshold = 100000;
+	private int threshold = 100000; 
 	private int thresholdStep = 100000;
 
 	// setters and getters
@@ -119,7 +119,7 @@ public class TextAnalysisFromFiles {
 		int rowIndex = 0;
 		boolean bookContent = false;
 
-		while (((currentLine = reader.readLine()) != null || rowIndex <= 40) && !bookContent) {
+		while (((currentLine = reader.readLine()) != null || rowIndex <= 40) && !bookContent) { // questi dati sono presenti nell'intestazione tipicamente tra le prime righe
 			if (currentLine.trim().toLowerCase().startsWith("language")
 					&& !currentLine.toLowerCase().contains("english"))
 				break;
@@ -158,21 +158,15 @@ public class TextAnalysisFromFiles {
 
 	private void calculateHeapsLaw(int vocabulary) {
 		// costanti
-		final int k = 47;
-		final double beta = 0.5;
+		final int k = 65;
+		final double beta = 0.55;
 		// Esempio di fine tuning eseguito per raffinare le previsioni
-		// double value = k * Math.pow((double) 1189894614, beta); // fitting for
-		// costants
-		// System.out.println("prevision " + k * Math.pow(this.getTokenCount(), beta));
-
-		double heapsValue = k * Math.pow(this.getTokenCount(), beta);
-		heapValuesList.add(heapsValue);
-		// System.out.println(vocabulary);
-		// System.out.println(getTokenCount());
-		// System.out.println(heapsValue);
+		// double value = k * Math.pow((double) 1189929244, beta); // fitting for costants (sapendo che in output abbiamo 6384579 parole distinte)
+		double value = k * Math.pow((double) getTokenCount(), beta);
+		heapValuesList.add(value);
 	}
 
-	private void calculateTtr(int vocabulary) {
+	private void calculateTtr(int vocabulary) { // poco rilevante su grandi quantità di dati
 		double ttr = (vocabulary * 1.0) / (getTokenCount() * 1.0);
 		System.out.println("Type Token Ratio\t" + String.format("%.6f", ttr));
 		System.out.println("Type Token Ratio in %\t" + String.format("%.3f", ttr * 100));

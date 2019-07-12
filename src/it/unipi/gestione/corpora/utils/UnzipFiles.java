@@ -21,7 +21,7 @@ public class UnzipFiles {
 	public static String UNWANTED_FILE_EXTENSIONS = "(.*)_M|JPE|PDF|MID|MP3|MUS|PDF|README";
 																								
 
-	private List<String> pathListForExtraction;
+	private List<String> pathListForExtraction; // lista di file paths per estrazione
 	private List<String> pathListEncodedFiles; // contains files with different encoding
 
 	public UnzipFiles() {
@@ -66,7 +66,7 @@ public class UnzipFiles {
 			zis.close();
 		}
 	}
-
+	// elimino gli stessi elementi con encoding diverso e restituisco la lista originale aggiornata
 	private void _filterDuplicates(List<String> pathList, List<String> normalizedPathList) {
 		for (String npl : normalizedPathList) {
 			String normalized = npl;
@@ -80,7 +80,7 @@ public class UnzipFiles {
 	}
 
 	public List<String> listAllfiles(File directory, List<String> pathList) throws IOException {
-		Pattern pattern = Pattern.compile(UNWANTED_FILE_EXTENSIONS);
+		Pattern pattern = Pattern.compile(UNWANTED_FILE_EXTENSIONS); // seleziono solo i libri, vedi naming conventions del progetto Gutenberg
 		for (final File f : directory.listFiles()) {
 			Matcher matcher = pattern.matcher(f.getName());
 			if (matcher.find()) {

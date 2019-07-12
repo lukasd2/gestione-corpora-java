@@ -12,9 +12,9 @@ public class GestioneCorpora {
 	public static void main(String args[]) throws IOException {
 		// Unix and Windows paths examples
 		final String UNIXinput = "/home/lukasz/gestione-corpora-java/";
-		final String WSinput = "F:\\Java Thingies\\test1g\\";
+		final String WSinput = "F:\\JavaProjects\\input\\";
 
-		final String WSdestPath = "F:\\Java Thingies\\1gout\\";
+		final String WSdestPath = "F:\\JavaProjects\\output1\\";
 		final String UnixdestPath = "/home/lukasz/gestione-corpora-java/output/";
 
 		// get path with independent OS format
@@ -23,7 +23,7 @@ public class GestioneCorpora {
 
 		UnzipFiles uf = new UnzipFiles();
 		long measureUnzip = startTimeMeasure("*** START UNZIPPING FILES ***");
-		//uf.unzipToDirectory(sourcePath, destPath);
+		uf.unzipToDirectory(sourcePath, destPath);
 		stopTimeMeasure(measureUnzip, "*** STOP UNZIPPING FILES ***");
 
 		long measureText = startTimeMeasure("*** START ANALYZING FILES ***");
