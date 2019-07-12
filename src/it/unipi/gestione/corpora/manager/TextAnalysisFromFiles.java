@@ -1,7 +1,5 @@
 package it.unipi.gestione.corpora.manager;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,32 +14,32 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.io.output.FileWriterWithEncoding;
-
 import it.unipi.gestione.corpora.utils.SimpleTokenizer;
 
 public class TextAnalysisFromFiles {
 
 	private final File[] listOfFiles;
 
-	Map<String, MutableInteger> map = new HashMap<String, MutableInteger>();
-	ArrayList<Double> heapValues = new ArrayList<Double>();
+	private Map<String, MutableInteger> frequencyMap = new HashMap<String, MutableInteger>();
+	private ArrayList<Double> heapValuesList = new ArrayList<Double>();
 
-	SimpleTokenizer st = new SimpleTokenizer();
+	public final SimpleTokenizer simpleTokenizer = new SimpleTokenizer();
+	private final String bookStart = "*** START OF THIS PROJECT GUTENBERG";
+	private final String bookEnd = "*** END OF THIS PROJECT GUTENBERG";
 
-	private boolean detailedStats;
 	private int tokenCount;
+	private int documentCount;
 
-	private int threshold = 10000;
-	private int thresholdStep = 10000;
+	private int threshold = 100000;
+	private int thresholdStep = 100000;
 
 	// setters and getters
-	public boolean getDetailedStats() {
-		return this.detailedStats;
+	public int getDocumentCount() {
+		return documentCount;
 	}
 
-	public void setDetailedStats(boolean detailedStats) {
-		this.detailedStats = detailedStats;
+	public void incrementDocumentCount() {
+		this.documentCount += 1;
 	}
 
 	public int getTokenCount() {
@@ -60,32 +58,34 @@ public class TextAnalysisFromFiles {
 		this.threshold += this.thresholdStep;
 	}
 
-	public TextAnalysisFromFiles(String destPath, boolean detailedStats) throws IOException {
-		this.setDetailedStats(detailedStats);
-
+	// constructor
+	public TextAnalysisFromFiles(String destPath) throws IOException {
 		File directoryText = new File(destPath);
 		listOfFiles = directoryText.listFiles();
-		
-		parseFile();
-		System.out.println(this.getTokenCount() + " tokens in total has been processed");
-		
+
+		parseFiles();
+		System.out.printf("\tTotal tokens processed: %d within %d separate text files!%n", this.getTokenCount(),
+				this.getDocumentCount());
+		// output
 		printResultsToFile();
 		printOrderedResultsToFile();
-		printHeapValues();
+		printHeapLawValues();
 	}
 
-	public void parseFile() {
+	public void parseFiles() {
 		for (File file : listOfFiles) {
 			if (file.isFile()) {
 				try {
-					parseText(file);
+					parseTextFromFile(file);
 				} catch (IOException e) {
+					System.out.println("Fallimento lettura del file errore:" + e.getMessage());
 					e.printStackTrace();
 				}
 			}
 		}
 	}
 
+	// wrapper per contare le occorrenze come valori interi <Integer>
 	private static class MutableInteger implements Comparable<Integer> {
 		int count = 1;
 
@@ -112,19 +112,16 @@ public class TextAnalysisFromFiles {
 		}
 	}
 
-	private void parseText(File file) throws IOException {
+	private void parseTextFromFile(File file) throws IOException {
 
 		BufferedReader reader = new BufferedReader(new FileReader(file));
-		String bookStart = "*** START OF THIS PROJECT GUTENBERG";
-		String bookEnd = "*** END OF THIS PROJECT GUTENBERG ";
-
-		String language = "English";
 		String currentLine;
 		int rowIndex = 0;
 		boolean bookContent = false;
 
-		while (((currentLine = reader.readLine()) != null || rowIndex <= 50) && !bookContent) {
-			if (currentLine.trim().startsWith("Language:") && !currentLine.contains(language))
+		while (((currentLine = reader.readLine()) != null || rowIndex <= 40) && !bookContent) {
+			if (currentLine.trim().toLowerCase().startsWith("language")
+					&& !currentLine.toLowerCase().contains("english"))
 				break;
 			if (currentLine.contains(bookStart))
 				bookContent = true;
@@ -134,22 +131,24 @@ public class TextAnalysisFromFiles {
 			reader.close();
 			return;
 		}
+
+		this.incrementDocumentCount();
+
 		while ((currentLine = reader.readLine()) != null) {
 			if (currentLine.isEmpty())
 				continue;
 			if (currentLine.contains(bookEnd))
 				break;
 
-			String[] wordList = st.split(currentLine.toLowerCase().trim());
+			String[] wordList = simpleTokenizer.split(currentLine.toLowerCase().trim());
 
 			for (String s : wordList) {
-				// if(!s.equals("\t")) TODO da considerare
-				map.compute(s, (k, v) -> v == null ? new MutableInteger(0) : v).increment();
+				frequencyMap.compute(s, (k, v) -> v == null ? new MutableInteger(0) : v).increment();
 				this.incrementTokenCount();
 			}
 			if (this.getTokenCount() >= this.getThreshold()) {
-				int vocabulary = map.size(); // le singole occorrenze di tutte le parole --> il vocabolario
-				calculateHeapsLaw(vocabulary); // TODO spiegare semplificazione numero token
+				int vocabulary = frequencyMap.size(); // le singole occorrenze di tutte le parole --> il vocabolario
+				calculateHeapsLaw(vocabulary); // semplificazione numero token per valori di threshold elevati
 				// calculateTtr(vocabulary);
 				this.incrementThreshold();
 			}
@@ -161,16 +160,16 @@ public class TextAnalysisFromFiles {
 		// costanti
 		final int k = 47;
 		final double beta = 0.5;
-
-		// double value = k * Math.pow((double) 603849, beta); TODO fitting for costants
-		// (STANFORD)
+		// Esempio di fine tuning eseguito per raffinare le previsioni
+		// double value = k * Math.pow((double) 1189894614, beta); // fitting for
+		// costants
 		// System.out.println("prevision " + k * Math.pow(this.getTokenCount(), beta));
 
 		double heapsValue = k * Math.pow(this.getTokenCount(), beta);
-		heapValues.add(heapsValue);
+		heapValuesList.add(heapsValue);
 		// System.out.println(vocabulary);
 		// System.out.println(getTokenCount());
-		//System.out.println(heapsValue);
+		// System.out.println(heapsValue);
 	}
 
 	private void calculateTtr(int vocabulary) {
@@ -180,8 +179,8 @@ public class TextAnalysisFromFiles {
 	}
 
 	private void printResultsToFile() throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriterWithEncoding("tokenizeResult.txt", UTF_8));
-		map.entrySet().forEach(entry -> {
+		BufferedWriter writer = new BufferedWriter(new FileWriter("tokenizeResult.txt"));
+		frequencyMap.entrySet().forEach(entry -> {
 			try {
 				writer.write(entry.getKey() + "\t" + entry.getValue().getInteger());
 				writer.newLine();
@@ -193,9 +192,9 @@ public class TextAnalysisFromFiles {
 	}
 
 	public void printOrderedResultsToFile() throws IOException {
-		BufferedWriter bw = new BufferedWriter(new FileWriterWithEncoding("tokenizeResultOrdered.txt", UTF_8));
+		BufferedWriter bw = new BufferedWriter(new FileWriter("tokenizeResultOrdered.txt"));
 
-		LinkedList<Entry<String, MutableInteger>> list = new LinkedList<>(map.entrySet());
+		LinkedList<Entry<String, MutableInteger>> list = new LinkedList<>(frequencyMap.entrySet());
 
 		Collections.sort(list, new Comparator<Map.Entry<String, MutableInteger>>() {
 			public int compare(Map.Entry<String, MutableInteger> o1, Map.Entry<String, MutableInteger> o2) {
@@ -209,13 +208,14 @@ public class TextAnalysisFromFiles {
 		}
 		bw.close();
 	}
-	
-	public void printHeapValues() throws IOException {
+
+	public void printHeapLawValues() throws IOException {
 		BufferedWriter bw2 = new BufferedWriter(new FileWriter("heapStats.txt"));
 
-		for(Double d : heapValues) {
+		for (Double d : heapValuesList) {
 			bw2.write(String.format("%.6f", d));
 			bw2.newLine();
 		}
+		bw2.close();
 	}
 }

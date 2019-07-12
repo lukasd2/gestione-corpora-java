@@ -18,7 +18,7 @@ public class SimpleTokenizer implements Tokenizer {
 			Pattern.compile("(?U)(\\.{3,})") 
 	};
 	
-    private static final Pattern WHITESPACE = Pattern.compile("(?U)\\s+");
+	private static final Pattern WHITESPACE = Pattern.compile("(?U)\\s+");
 
 	@Override
 	public String[] split(String text) {

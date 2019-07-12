@@ -9,14 +9,12 @@ import it.unipi.gestione.corpora.utils.UnzipFiles;
 
 public class GestioneCorpora {
 
-	private final static boolean detailedStatistics = true;
-	
 	public static void main(String args[]) throws IOException {
 		// Unix and Windows paths examples
 		final String UNIXinput = "/home/lukasz/gestione-corpora-java/";
-		final String WSinput = "F:\\Java Thingies\\input\\";
+		final String WSinput = "F:\\Java Thingies\\test1g\\";
 
-		final String WSdestPath = "F:\\Java Thingies\\output\\";
+		final String WSdestPath = "F:\\Java Thingies\\1gout\\";
 		final String UnixdestPath = "/home/lukasz/gestione-corpora-java/output/";
 
 		// get path with independent OS format
@@ -25,13 +23,14 @@ public class GestioneCorpora {
 
 		UnzipFiles uf = new UnzipFiles();
 		long measureUnzip = startTimeMeasure("*** START UNZIPPING FILES ***");
-		uf.unzipToDirectory(sourcePath, destPath);
+		//uf.unzipToDirectory(sourcePath, destPath);
 		stopTimeMeasure(measureUnzip, "*** STOP UNZIPPING FILES ***");
-		
+
 		long measureText = startTimeMeasure("*** START ANALYZING FILES ***");
-		TextAnalysisFromFiles rff = new TextAnalysisFromFiles(destPath, detailedStatistics);
+		TextAnalysisFromFiles rff = new TextAnalysisFromFiles(destPath);
 		stopTimeMeasure(measureText, "*** STOP ANALYZING FILES ***");
 	}
+
 	// metodi di utilita per il calcolo dei tempi di esecuzione
 	private static long startTimeMeasure(String msg) {
 		System.out.println(msg);
